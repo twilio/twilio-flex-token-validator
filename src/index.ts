@@ -16,10 +16,11 @@ export type Callback = (error: any, response: any) => void;
 export type HandlerFn = (context: Context, event: Event, callback: Callback) => void;
 
 /**
- * Validator function decorator used in Twilio Functions. Calls {@link validator}
+ * A validator to be used with Twilio Function. It uses the {@link validator} to validate the token
+ *
  * @param handlerFn    the Twilio Runtime Handler Function
  */
-export const runtimeValidator = (handlerFn: HandlerFn): HandlerFn => {
+export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
     // tslint:disable-next-line
     return function(context, event, callback) {
         const failedResponse = (message: string) => {
