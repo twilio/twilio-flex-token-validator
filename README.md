@@ -1,6 +1,5 @@
 <h1 align="center">Twilio Flex Token Validator</h1>
-<p align="center">Monorepo for all the tooling needed to create a custom <a href="https://www.twilio.com/flex" target="_blank">Twilio Flex</a> plugins
-</p>
+<p align="center">Flex JWE Token Validator provides an easy way to validate a Flex JWE token.</p>
 
 <p align="center">
     <a href="https://travis-ci.com/twilio/twilio-flex-token-validator">
