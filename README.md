@@ -32,7 +32,7 @@ You can also use this validator inside any existing Node servers:
 const JWEValidator = require('twilio-flex-token-validator').validator;
 
 JWEValidator(jweToken, accountSid, authToken)
-    .then(resp => {
+    .then(tokenResult => {
       // validated
     })
     .catch(err => {
@@ -40,3 +40,21 @@ JWEValidator(jweToken, accountSid, authToken)
     });
 ```
 
+## Token Result
+
+The validated token result will contain the following data:
+
+```json
+{
+  "valid": true,
+  "code": 0,
+  "message": null,
+  "expiration": "2018-09-24T23:22:44.240Z",
+  "realm_user_id": "user@example.com",
+  "identity": "user_40example_2Dcom",
+  "roles":[
+    "agent"
+  ],
+  "worker_sid": "WKxxx"
+}
+```
