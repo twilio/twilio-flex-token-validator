@@ -1,5 +1,20 @@
-# twilio-flex-token-validator
-Flex JWE Token Validator provides an easy way to validate a Flex JWE token. 
+<h1 align="center">Twilio Flex Token Validator</h1>
+<p align="center">Flex JWE Token Validator provides an easy way to validate a Flex JWE token.</p>
+
+<p align="center">
+    <a href="https://travis-ci.com/twilio/twilio-flex-token-validator">
+        <img src="https://travis-ci.com/twilio/twilio-flex-token-validator.svg?branch=master" title="Build Status" />
+    </a>
+    <a href="https://www.npmjs.com/package/twilio-flex-token-validator">
+        <img src="https://img.shields.io/npm/v/twilio-flex-token-validator.svg?style=flat-square" title="npm" />
+    </a>
+    <a href="https://www.npmjs.com/package/twilio-flex-token-validator">
+        <img src="https://img.shields.io/npm/dt/twilio-flex-token-validator.svg?style=flat-square" title="npm" />
+    </a>
+    <a href="./LICENSE.md">
+        <img src="https://img.shields.io/badge/license-MIT-green.svg" title="License" />
+    </a>
+</p>
 
 ## Usage
 
@@ -14,9 +29,9 @@ First visit [Twilio Function Configuration](https://www.twilio.com/console/runti
 Then in your Twilio Function, wrap your main `handler` with this validator:
 
 ```js
-const JWEValidator = require('twilio-flex-token-validator').runtimeValidator;
+const TokenValidator = require('twilio-flex-token-validator').runtimeValidator;
 
-exports.handler = JWEValidator(function(context, event, callback) {
+exports.handler = TokenValidator(function(context, event, callback) {
     // Your normal Twilio Function goes here.
     // This block will only be called your token is validated, otherwise it returns a 403.
 });
@@ -29,9 +44,9 @@ This validator assumes that the token is provided as the `Token` key. The succes
 You can also use this validator inside any existing Node servers:
 
 ```js
-const JWEValidator = require('twilio-flex-token-validator').validator;
+const TokenValidator = require('twilio-flex-token-validator').validator;
 
-JWEValidator(jweToken, accountSid, authToken)
+TokenValidator(token, accountSid, authToken)
     .then(tokenResult => {
       // validated
     })
@@ -58,3 +73,11 @@ The validated token result will contain the following data:
   "worker_sid": "WKxxx"
 }
 ```
+
+## Contributing
+
+Check out [CONTRIBUTING](CONTRIBUTING.md) for more information on how to contribute to this project.
+
+## License
+
+Twilio Flex Token Validator is licensed under [MIT](LICENSE).
