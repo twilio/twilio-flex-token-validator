@@ -12,7 +12,11 @@
   },
   "license": "MIT",
   "author": "",
-  "main": "index.js",
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "prebuild": "rm -rf dist",
     "build": "tsc",
