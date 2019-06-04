@@ -2,23 +2,31 @@
   "name": "twilio-flex-token-validator",
   "version": "1.0.0",
   "description": "Flex JWE Token Validator",
-  "main": "index.js",
-  "scripts": {
-    "prebuild": "rm -rf dist",
-    "build": "tsc",
-    "test": "jest",
-    "test:watch": "jest --watchAll"
+  "homepage": "https://github.com/twilio/twilio-flex-token-validator#readme",
+  "bugs": {
+    "url": "https://github.com/twilio/twilio-flex-token-validator/issues"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/twilio/twilio-flex-token-validator.git"
   },
-  "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/twilio/twilio-flex-token-validator/issues"
+  "author": "",
+  "main": "index.js",
+  "scripts": {
+    "prebuild": "rm -rf dist",
+    "build": "tsc",
+    "lint": "tslint --project tsconfig.json",
+    "lint:fix": "tslint --project tsconfig.json --fix",
+    "test": "jest",
+    "test:watch": "jest --watchAll"
   },
-  "homepage": "https://github.com/twilio/twilio-flex-token-validator#readme",
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint",
+      "pre-push": "CI=true npm run test"
+    }
+  },
   "devDependencies": {
     "@babel/cli": "^7.4.4",
     "@babel/core": "^7.4.5",
@@ -31,9 +39,11 @@
     "babel-core": "^6.26.3",
     "babel-jest": "^24.8.0",
     "babel-register": "^6.26.0",
+    "husky": "^2.3.0",
     "jest": "^24.8.0",
     "nock": "^10.0.6",
     "ts-jest": "^24.0.2",
+    "tslint": "^5.17.0",
     "typescript": "^3.5.1"
   }
 }
