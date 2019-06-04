@@ -1,4 +1,4 @@
-import { runtimeValidator, validator, Context, Event } from './index';
+import { functionValidator, validator, Context, Event } from './index';
 import * as nock from 'nock';
 
 // jest.mock('https');
@@ -106,7 +106,7 @@ describe('index.ts', () => {
         });
     });
 
-    describe('runtimeValidator', () => {
+    describe('functionValidator', () => {
         const context: Context = {
             ACCOUNT_SID: 'AC123',
             AUTH_TOKEN: 'AUTH123',
@@ -130,7 +130,7 @@ describe('index.ts', () => {
                 setBody
             }));
 
-            await runtimeValidator(fn)(context, event, cb);
+            await functionValidator(fn)(context, event, cb);
 
             expect(fn).not.toHaveBeenCalled();
             expect(cb).toHaveBeenCalledTimes(1);
@@ -148,7 +148,7 @@ describe('index.ts', () => {
             const fn = jest.fn();
             const cb = jest.fn();
 
-            await runtimeValidator(fn)(context, event, cb);
+            await functionValidator(fn)(context, event, cb);
 
             expect(fn).toHaveBeenCalledTimes(1);
             expect(cb).not.toHaveBeenCalled();

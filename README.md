@@ -29,7 +29,7 @@ First visit [Twilio Function Configuration](https://www.twilio.com/console/runti
 Then in your Twilio Function, wrap your main `handler` with this validator:
 
 ```js
-const TokenValidator = require('twilio-flex-token-validator').runtimeValidator;
+const TokenValidator = require('twilio-flex-token-validator').functionValidator;
 
 exports.handler = TokenValidator(function(context, event, callback) {
     // Your normal Twilio Function goes here.
