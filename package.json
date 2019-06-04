@@ -10,7 +10,7 @@
     "type": "git",
     "url": "git+https://github.com/twilio/twilio-flex-token-validator.git"
   },
-  "license": "ISC",
+  "license": "MIT",
   "author": "",
   "main": "index.js",
   "scripts": {
