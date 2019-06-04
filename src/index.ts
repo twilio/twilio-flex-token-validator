@@ -17,7 +17,7 @@ export type HandlerFn = (context: Context, event: Event, callback: Callback) => 
 
 /**
  * Validator function decorator used in Twilio Functions. Calls {@link validator}
- * @param handlerFn	the Twilio Runtime Handler Function
+ * @param handlerFn    the Twilio Runtime Handler Function
  */
 export const runtimeValidator = (handlerFn: HandlerFn): HandlerFn => {
 	return function(context, event, callback) {
@@ -51,9 +51,9 @@ export const runtimeValidator = (handlerFn: HandlerFn): HandlerFn => {
 /**
  * Validates that the Token is valid
  *
- * @param token			the token to validate
- * @param accountSid	the accountSid
- * @param authToken		the authToken
+ * @param token        the token to validate
+ * @param accountSid   the accountSid
+ * @param authToken    the authToken
  */
 export const validator = (token: string, accountSid: string, authToken: string): Promise<object> => {
 	return new Promise((resolve, reject) => {
