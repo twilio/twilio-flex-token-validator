@@ -3,13 +3,13 @@ import * as https from 'https';
 declare const Twilio: any;
 
 export interface Context {
-	ACCOUNT_SID: string;
-	AUTH_TOKEN: string;
+    ACCOUNT_SID: string;
+    AUTH_TOKEN: string;
 }
 
 export interface Event {
-	Token: string;
-	TokenResult?: object;
+    Token: string;
+    TokenResult?: object;
 }
 
 export type Callback = (error: any, response: any) => void;
@@ -20,32 +20,34 @@ export type HandlerFn = (context: Context, event: Event, callback: Callback) => 
  * @param handlerFn    the Twilio Runtime Handler Function
  */
 export const runtimeValidator = (handlerFn: HandlerFn): HandlerFn => {
-	return function(context, event, callback) {
-		const failedResponse = (message: string) => {
-			const response = new Twilio.Response();
-			response.setStatusCode(403);
-			response.setBody(message);
+    // tslint:disable-next-line
+    return function(context, event, callback) {
+        const failedResponse = (message: string) => {
+            const response = new Twilio.Response();
+            response.setStatusCode(403);
+            response.setBody(message);
 
-			callback(null, response);
-		};
+            callback(null, response);
+        };
 
-		const accountSid = context.ACCOUNT_SID;
-		const authToken = context.AUTH_TOKEN;
-		const token = event.Token;
+        const accountSid = context.ACCOUNT_SID;
+        const authToken = context.AUTH_TOKEN;
+        const token = event.Token;
 
-		if (!accountSid || !authToken) {
-			return failedResponse('AccountSid or AuthToken was not provided. For more information, please visit https://twilio.com/console/runtime/functions/configure');
-		}
+        if (!accountSid || !authToken) {
+            // tslint:disable-next-line
+            return failedResponse('AccountSid or AuthToken was not provided. For more information, please visit https://twilio.com/console/runtime/functions/configure');
+        }
 
-		return validator(token, accountSid, authToken)
-			.then(result => {
-				event.TokenResult = result;
-				return handlerFn(context, event, callback);
-			})
-			.catch(err => {
-				failedResponse(err.message)
-			});
-	}
+        return validator(token, accountSid, authToken)
+            .then((result) => {
+                event.TokenResult = result;
+                return handlerFn(context, event, callback);
+            })
+            .catch((err) => {
+                failedResponse(err.message);
+            });
+    };
 };
 
 /**
@@ -56,49 +58,49 @@ export const runtimeValidator = (handlerFn: HandlerFn): HandlerFn => {
  * @param authToken    the authToken
  */
 export const validator = (token: string, accountSid: string, authToken: string): Promise<object> => {
-	return new Promise((resolve, reject) => {
-		if (!token) {
-			reject('Token was not provided');
-		}
+    return new Promise((resolve, reject) => {
+        if (!token) {
+            reject('Token was not provided');
+        }
 
-		if (!accountSid || !authToken) {
-			reject('AccountSid or AuthToken was not provided');
-		}
+        if (!accountSid || !authToken) {
+            reject('AccountSid or AuthToken was not provided');
+        }
 
-		const authorization = Buffer.from(`${accountSid}:${authToken}`);
-		const requestData = JSON.stringify({token: token});
-		const requestOption = {
-			hostname: 'iam.twilio.com',
-			port: 443,
-			path: `/v1/Accounts/${accountSid}/Tokens/validate`,
-			method: 'POST',
-			headers: {
-				'Authorization': `Basic ${authorization.toString('base64')}`,
-				'Cache-Control': 'no-cache',
-				'Content-Type': 'application/json',
-				'Content-Length': requestData.length
-			}
-		};
+        const authorization = Buffer.from(`${accountSid}:${authToken}`);
+        const requestData = JSON.stringify({token});
+        const requestOption = {
+            hostname: 'iam.twilio.com',
+            port: 443,
+            path: `/v1/Accounts/${accountSid}/Tokens/validate`,
+            method: 'POST',
+            headers: {
+                'Authorization': `Basic ${authorization.toString('base64')}`,
+                'Cache-Control': 'no-cache',
+                'Content-Type': 'application/json',
+                'Content-Length': requestData.length,
+            },
+        };
 
-		const req = https.request(requestOption, resp => {
-			let data = "";
-			resp.setEncoding('utf8');
-			resp.on('data', d => data += d);
-			resp.on('end', () => {
-				try {
-					const result = JSON.parse(data);
-					if (result.valid) {
-						resolve(result);
-					} else {
-						reject(result.message);
-					}
-				} catch (err) {
-					reject(err.message);
-				}
-			});
-		});
-		req.on('error', err => reject(err.message));
-		req.write(requestData);
-		req.end()
-	});
+        const req = https.request(requestOption, (resp) => {
+            let data = '';
+            resp.setEncoding('utf8');
+            resp.on('data', (d) => data += d);
+            resp.on('end', () => {
+                try {
+                    const result = JSON.parse(data);
+                    if (result.valid) {
+                        resolve(result);
+                    } else {
+                        reject(result.message);
+                    }
+                } catch (err) {
+                    reject(err.message);
+                }
+            });
+        });
+        req.on('error', (err) => reject(err.message));
+        req.write(requestData);
+        req.end();
+    });
 };
