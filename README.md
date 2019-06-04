@@ -58,3 +58,4 @@ The validated token result will contain the following data:
   "worker_sid": "WKxxx"
 }
 ```
+
