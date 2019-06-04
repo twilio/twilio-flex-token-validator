@@ -81,4 +81,4 @@ Check out [CONTRIBUTING](CONTRIBUTING.md) for more information on how to contrib
 
 ## License
 
-Flex Plugin Builder is licensed under [MIT](LICENSE).
+Twilio Flex Token Validator is licensed under [MIT](LICENSE).
