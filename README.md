@@ -10,7 +10,7 @@
     </a>
     <a href="https://www.npmjs.com/package/twilio-flex-token-validator">
         <img src="https://img.shields.io/npm/dt/twilio-flex-token-validator.svg?style=flat-square" title="npm" />
-        </a>
+    </a>
     <a href="./LICENSE.md">
         <img src="https://img.shields.io/badge/license-MIT-green.svg" title="License" />
     </a>
