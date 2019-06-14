@@ -24,22 +24,22 @@ You can use this validator either within a [Twilio Function](https://www.twilio.
 
 ### Using in Twilio Function
 
-First visit [Twilio Function Configuration](https://www.twilio.com/console/runtime/functions/configure) and add `twilio-flex-token-validator` as an NPM package. While you are on the configuration page, make sure `Enable ACCOUNT_SID and AUTH_TOKEN` is also checked.
+First visit [Twilio Function Configuration](https://www.twilio.com/console/runtime/functions/configure) and add `twilio-flex-token-validator` as an NPM package. On the same page, enable the checkbox `Enable ACCOUNT_SID and AUTH_TOKEN`. 
 
-Then in your Twilio Function, wrap your main `handler` with this validator:
+In your Twilio Function, wrap your main `handler` with this validator:
 
 ```js
 const TokenValidator = require('twilio-flex-token-validator').functionValidator;
 
 exports.handler = TokenValidator(function(context, event, callback) {
     // Your normal Twilio Function goes here.
-    // This block will only be called your token is validated, otherwise it returns a 403.
+    // This block will only be called if your token is validated, otherwise it returns a 403.
 });
 ``` 
 
 This validator assumes that the token is provided as the `Token` key. The successful result of the token validation is added to `event.TokenResult`.
 
-### Using in your own Node server
+### Using in any NodeJS application
 
 You can also use this validator inside any existing Node servers:
 
