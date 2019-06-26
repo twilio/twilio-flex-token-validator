@@ -45,9 +45,7 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
                 event.TokenResult = result;
                 return handlerFn(context, event, callback);
             })
-            .catch((err) => {
-                failedResponse(err.message);
-            });
+            .catch(failedResponse);
     };
 };
 
