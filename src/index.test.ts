@@ -31,7 +31,7 @@ describe('index.ts', () => {
             try {
                 await validator('', '', '');
             } catch (err) {
-                expect(err).toEqual('Token was not provided');
+                expect(err).toEqual('Unauthorized: Token was not provided');
                 done();
             }
         });
@@ -40,7 +40,7 @@ describe('index.ts', () => {
             try {
                 await validator('token-123', '', '');
             } catch (err) {
-                expect(err).toContain('AccountSid or AuthToken was not provided');
+                expect(err).toContain('Unauthorized: AccountSid or AuthToken was not provided');
                 done();
             }
         });
@@ -49,7 +49,7 @@ describe('index.ts', () => {
             try {
                 await validator('token-123', 'AC123', '');
             } catch (err) {
-                expect(err).toContain('AccountSid or AuthToken was not provided');
+                expect(err).toContain('Unauthorized: AccountSid or AuthToken was not provided');
                 done();
             }
         });
