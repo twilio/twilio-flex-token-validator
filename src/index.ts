@@ -1,7 +1,5 @@
 import * as https from 'https';
 
-declare const Twilio: any;
-
 export interface Context {
     ACCOUNT_SID: string;
     AUTH_TOKEN: string;
@@ -12,7 +10,7 @@ export interface Event {
     TokenResult?: object;
 }
 
-export type Callback = (error: any, response: any) => void;
+export type Callback = (error: any, response: Twilio.Response) => void;
 export type HandlerFn = (context: Context, event: Event, callback: Callback) => void;
 
 /**
@@ -37,7 +35,7 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
 
         if (!accountSid || !authToken) {
             // tslint:disable-next-line
-            return failedResponse('AccountSid or AuthToken was not provided. For more information, please visit https://twilio.com/console/runtime/functions/configure');
+            return failedResponse('Unauthorized: AccountSid or AuthToken was not provided. For more information, please visit https://twilio.com/console/runtime/functions/configure');
         }
 
         return validator(token, accountSid, authToken)
@@ -59,11 +57,11 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
 export const validator = (token: string, accountSid: string, authToken: string): Promise<object> => {
     return new Promise((resolve, reject) => {
         if (!token) {
-            reject('Token was not provided');
+            reject('Unauthorized: Token was not provided');
         }
 
         if (!accountSid || !authToken) {
-            reject('AccountSid or AuthToken was not provided');
+            reject('Unauthorized: AccountSid or AuthToken was not provided');
         }
 
         const authorization = Buffer.from(`${accountSid}:${authToken}`);
