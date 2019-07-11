@@ -125,9 +125,11 @@ describe('index.ts', () => {
             const cb = jest.fn();
             const setStatusCode = jest.fn();
             const setBody = jest.fn();
+            const appendHeader = jest.fn();
             (global as any).Twilio.Response = jest.fn().mockImplementation(() => ({
                 setStatusCode,
-                setBody
+                setBody,
+                appendHeader,
             }));
 
             await functionValidator(fn)(context, event, cb);
@@ -136,6 +138,7 @@ describe('index.ts', () => {
             expect(cb).toHaveBeenCalledTimes(1);
             expect(setStatusCode).toHaveBeenCalledTimes(1);
             expect(setBody).toHaveBeenCalledTimes(1);
+            expect(appendHeader).toHaveBeenCalledTimes(4);
 
             expect(setStatusCode).toHaveBeenCalledWith(403);
         });
