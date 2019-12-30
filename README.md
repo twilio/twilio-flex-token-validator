@@ -39,6 +39,8 @@ exports.handler = TokenValidator(function(context, event, callback) {
 
 This validator assumes that the token is provided as the `Token` key. The successful result of the token validation is added to `event.TokenResult`.
 
+Make sure the checkbox `Check for valid Twilio signature` is _disabled_. This token validator will handle the authentication of the request instead.
+
 ### Using in any NodeJS application
 
 You can also use this validator inside any existing Node servers:
