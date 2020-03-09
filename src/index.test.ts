@@ -1,5 +1,6 @@
-import { functionValidator, validator, Context, Event } from './index';
+import {functionValidator, validator, Context, Event, Callback} from './index';
 import * as nock from 'nock';
+import DoneCallback = jest.DoneCallback;
 
 // jest.mock('https');
 // const https = require('https');
@@ -143,20 +144,35 @@ describe('index.ts', () => {
             expect(setStatusCode).toHaveBeenCalledWith(403);
         });
 
-        it('should validate', async () => {
-            const scope = nock('https://iam.twilio.com')
-                .post('/v1/Accounts/AC123/Tokens/validate', {token: event.Token})
-                .reply(200, '{"valid":true, "other": "parameter"}');
+      it('should validate a non-async handler', async (done) => {
+        const scope = nock('https://iam.twilio.com')
+          .post('/v1/Accounts/AC123/Tokens/validate', {token: event.Token})
+          .reply(200, '{"valid":true, "other": "parameter"}');
 
-            const fn = jest.fn();
-            const cb = jest.fn();
+        const fn = (ignore1: Context, ignore2: Event, callback: Callback) => {
+          setTimeout(() => {
+            (callback as any)();
+          });
+          // no return statement
+        };
+        await functionValidator(fn)(context, event, done);
+        expect(scope.isDone()).toBeTruthy();
+      });
 
-            await functionValidator(fn)(context, event, cb);
+      it('should validate a async handler', async () => {
+        const scope = nock('https://iam.twilio.com')
+          .post('/v1/Accounts/AC123/Tokens/validate', {token: event.Token})
+          .reply(200, '{"valid":true, "other": "parameter"}');
 
-            expect(fn).toHaveBeenCalledTimes(1);
-            expect(cb).not.toHaveBeenCalled();
+        const fn = () => {
+          return new Promise(resolve => setTimeout(resolve));
+        };
+        const cb = jest.fn();
 
-            expect(scope.isDone()).toBeTruthy();
-        });
+        await functionValidator(fn)(context, event, cb);
+
+        expect(cb).not.toHaveBeenCalled();
+        expect(scope.isDone()).toBeTruthy();
+      });
     });
 });
