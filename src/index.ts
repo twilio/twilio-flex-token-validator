@@ -43,11 +43,16 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
         }
 
         return validator(token, accountSid, authToken)
-            .then((result) => {
-                event.TokenResult = result;
-                return handlerFn(context, event, callback);
-            })
-            .catch(failedResponse);
+          .then((result) => {
+              event.TokenResult = result;
+              const promise = handlerFn(context, event, callback);
+              if (promise === undefined) {
+                  return new Promise((resolve) => setTimeout(resolve, 1_000_000));
+              }
+
+              return promise;
+          })
+          .catch(failedResponse);
     };
 };
 
