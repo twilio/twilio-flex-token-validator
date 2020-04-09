@@ -2,11 +2,6 @@ import * as nock from 'nock';
 
 import { functionValidator, validator, Context, Event } from '.';
 
-/*
- * jest.mock('https');
- * const https = require('https');
- */
-
 describe('index.ts', () => {
   beforeAll(() => {
     nock.disableNetConnect();

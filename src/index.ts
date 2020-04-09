@@ -19,7 +19,6 @@ export type HandlerFn = (context: Context, event: Event, callback: Callback) => 
  * @param handlerFn    the Twilio Runtime Handler Function
  */
 export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
-  // tslint:disable-next-line
   return (context, event, callback) => {
     const failedResponse = (message: string) => {
       const response = new Twilio.Response();
@@ -38,7 +37,6 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
     const token = event.Token;
 
     if (!accountSid || !authToken) {
-      // tslint:disable-next-line
       return failedResponse(
         'Unauthorized: AccountSid or AuthToken was not provided. For more information, please visit https://twilio.com/console/runtime/functions/configure',
       );
