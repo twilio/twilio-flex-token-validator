@@ -1,15 +1,17 @@
 {
   "name": "twilio-flex-token-validator",
-  "version": "1.5.0",
+  "version": "1.5.1",
   "description": "Flex JWE Token Validator",
   "keywords": [
     "flex",
     "function",
+    "functions",
     "plugins",
     "serverless",
     "token",
     "twilio",
-    "validator"
+    "validator",
+    "contact center"
   ],
   "homepage": "https://github.com/twilio/twilio-flex-token-validator#readme",
   "bugs": {
@@ -29,8 +31,8 @@
   "scripts": {
     "prebuild": "rm -rf dist",
     "build": "tsc",
-    "lint": "tslint --project tsconfig.json",
-    "lint:fix": "tslint --project tsconfig.json --fix",
+    "lint": "eslint --ext ts src/",
+    "lint:fix": "npm run lint -- --fix",
     "test": "jest",
     "test:watch": "jest --watchAll"
   },
@@ -41,22 +43,23 @@
     }
   },
   "devDependencies": {
-    "@babel/cli": "^7.7.7",
-    "@babel/core": "^7.7.7",
-    "@babel/polyfill": "^7.7.0",
-    "@babel/preset-env": "^7.7.7",
-    "@babel/preset-typescript": "^7.7.7",
-    "@types/jest": "^24.0.25",
+    "@babel/cli": "^7.8.4",
+    "@babel/core": "^7.9.0",
+    "@babel/polyfill": "^7.8.7",
+    "@babel/preset-env": "^7.9.5",
+    "@babel/preset-typescript": "^7.9.0",
+    "@types/jest": "^25.2.1",
     "@types/nock": "^11.1.0",
-    "@types/node": "^13.1.2",
+    "@types/node": "^13.11.1",
     "babel-core": "^6.26.3",
-    "babel-jest": "^24.9.0",
+    "babel-jest": "^25.3.0",
     "babel-register": "^6.26.0",
-    "husky": "^3.1.0",
-    "jest": "^24.9.0",
-    "nock": "^11.7.0",
-    "ts-jest": "^24.2.0",
-    "tslint": "^5.20.1",
-    "typescript": "^3.7.4"
+    "eslint": "^6.8.0",
+    "eslint-config-twilio-ts": "^1.22.0",
+    "husky": "^4.2.4",
+    "jest": "^25.3.0",
+    "nock": "^12.0.3",
+    "ts-jest": "^25.3.1",
+    "typescript": "^3.8.3"
   }
 }
