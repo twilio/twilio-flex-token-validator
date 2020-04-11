@@ -1,6 +1,6 @@
 {
   "name": "twilio-flex-token-validator",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Flex JWE Token Validator",
   "keywords": [
     "flex",
