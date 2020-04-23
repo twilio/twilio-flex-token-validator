@@ -49,12 +49,28 @@ You can also use this validator inside any existing Node servers:
 const TokenValidator = require('twilio-flex-token-validator').validator;
 
 TokenValidator(token, accountSid, authToken)
-    .then(tokenResult => {
-      // validated
-    })
-    .catch(err => {
-      // validation failed
-    });
+  .then(tokenResult => {
+    // validated
+  })
+  .catch(err => {
+    // validation failed
+  });
+```
+
+You can use a [Twilio API Key](https://www.twilio.com/console/runtime/api-keys) instead of directly using the root auth token. We recommend doing this because API keys are easier to revoke and rotate.
+
+```js
+const TokenValidator = require('twilio-flex-token-validator').validator;
+
+TokenValidator(token, apiKey, apiSecret, {
+  accountSid: yourAccountSid
+})
+  .then(tokenResult => {
+    // validated
+  })
+  .catch(err => {
+    // validation failed
+  });
 ```
 
 ## Token Result
