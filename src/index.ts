@@ -10,6 +10,10 @@ export interface Event {
   TokenResult?: object;
 }
 
+export interface ValidatorOptions {
+  accountSid: string;
+}
+
 export type Callback = (error: any, response: Twilio.Response) => void;
 export type HandlerFn = (context: Context, event: Event, callback: Callback) => void;
 
@@ -54,11 +58,17 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
 /**
  * Validates that the Token is valid
  *
- * @param token        the token to validate
- * @param accountSid   the accountSid
- * @param authToken    the authToken
+ * @param token               the token to validate
+ * @param accountSid          the accountSid or API key sid
+ * @param authToken           the authToken or API key secret
+ * @param options.accountSid  optional accountSid that's specified when using an API key
  */
-export const validator = async (token: string, accountSid: string, authToken: string): Promise<object> => {
+export const validator = async (
+  token: string,
+  accountSid: string,
+  authToken: string,
+  options?: ValidatorOptions,
+): Promise<object> => {
   return new Promise((resolve, reject) => {
     if (!token) {
       reject('Unauthorized: Token was not provided');
@@ -70,12 +80,18 @@ export const validator = async (token: string, accountSid: string, authToken: st
       return;
     }
 
+    // Twilio API key SIDs start with SK
+    if (accountSid.substring(0, 2) === 'SK' && !options?.accountSid) {
+      reject('Unauthorized: An AccountSid must be provided in options if using an API Key');
+      return;
+    }
+
     const authorization = Buffer.from(`${accountSid}:${authToken}`);
     const requestData = JSON.stringify({ token });
     const requestOption = {
       hostname: 'iam.twilio.com',
       port: 443,
-      path: `/v1/Accounts/${accountSid}/Tokens/validate`,
+      path: `/v1/Accounts/${options?.accountSid || accountSid}/Tokens/validate`,
       method: 'POST',
       headers: {
         Authorization: `Basic ${authorization.toString('base64')}`,

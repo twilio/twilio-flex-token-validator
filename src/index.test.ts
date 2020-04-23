@@ -51,6 +51,15 @@ describe('index.ts', () => {
       }
     });
 
+    it('should fail if options.accountSid is not provided for an API key', async (done) => {
+      try {
+        await validator('token-123', 'SK123', 'apiSecret');
+      } catch (err) {
+        expect(err).toContain('Unauthorized: An AccountSid must be provided in options if using an API Key');
+        done();
+      }
+    });
+
     it('should handle request failure', async (done) => {
       const scope = mockHttps().replyWithError('this failed');
 
@@ -94,6 +103,21 @@ describe('index.ts', () => {
         .reply(200, '{"valid":true, "other": "parameter"}');
 
       const response = await validator('token-123', 'AC123', 'authToken');
+      expect(response).toEqual({ valid: true, other: 'parameter' });
+
+      expect(scope.isDone()).toBeTruthy();
+    });
+
+    it('should validate with an API key', async () => {
+      const scope = nock('https://iam.twilio.com', {
+        reqheaders: {
+          Authorization: 'Basic U0sxMjM6YXBpU2VjcmV0',
+        },
+      })
+        .post('/v1/Accounts/AC234/Tokens/validate', { token: 'token-123' })
+        .reply(200, '{"valid":true, "other": "parameter"}');
+
+      const response = await validator('token-123', 'SK123', 'apiSecret', { accountSid: 'AC234' });
       expect(response).toEqual({ valid: true, other: 'parameter' });
 
       expect(scope.isDone()).toBeTruthy();
