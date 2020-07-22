@@ -5,6 +5,8 @@
     "rules": {
       "@typescript-eslint/no-explicit-any": "off",
       "@typescript-eslint/no-use-before-define": "off",
-      "prefer-promise-reject-errors": "off"
+      "prefer-promise-reject-errors": "off",
+      "@typescript-eslint/ban-types": "off",
+      "import/no-unused-modules": "off"
     }
   }
