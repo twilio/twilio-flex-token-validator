@@ -1,5 +1,16 @@
 import * as https from 'https';
 
+declare namespace Twilio {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  class Response {
+    public appendHeader(key: string, value: string): void;
+
+    public setStatusCode(code: number): void;
+
+    public setBody(body: string): void;
+  }
+}
+
 export interface Context {
   ACCOUNT_SID: string;
   AUTH_TOKEN: string;
