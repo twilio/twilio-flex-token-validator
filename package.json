@@ -23,11 +23,11 @@
   },
   "license": "MIT",
   "author": "",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "prebuild": "rm -rf dist",
     "build": "tsc",
@@ -63,6 +63,6 @@
     "typescript": "^4.1.2"
   },
   "engines": {
-    "node": ">=8.17.0"
+    "node": ">=10"
   }
 }
