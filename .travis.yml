@@ -10,6 +10,9 @@ node_js:
 before_script:
   - npm install
 
+after_success:
+  - codecov --token="$CODECOV_TOKEN"
+
 script:
   - npm run lint
   - npm run test
