@@ -1,7 +1,11 @@
 language: node_js
 
 node_js:
+  - '14'
   - '12'
+  - '10'
+  - 'node'
+  - 'lts/*'
 
 before_script:
   - npm install
@@ -14,4 +18,4 @@ branches:
   except:
     - /^v\d+\.\d+\.\d+$/
   only:
-    - master
+    - main
