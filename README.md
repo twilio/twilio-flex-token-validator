@@ -3,16 +3,19 @@
 
 <p align="center">
     <a href="https://travis-ci.com/twilio/twilio-flex-token-validator">
-        <img src="https://travis-ci.com/twilio/twilio-flex-token-validator.svg?branch=master" title="Build Status" />
+      <img src="https://travis-ci.com/twilio/twilio-flex-token-validator.svg?branch=master" title="Build Status" />
+    </a>
+    <a href="https://codecov.io/gh/twilio/twilio-flex-token-validator">
+      <img src="https://codecov.io/gh/twilio/twilio-flex-token-validator/branch/main/graph/badge.svg?token=vfjh2eKfxc"/>
     </a>
     <a href="https://www.npmjs.com/package/twilio-flex-token-validator">
-        <img src="https://img.shields.io/npm/v/twilio-flex-token-validator.svg?style=flat-square" title="npm" />
+      <img src="https://img.shields.io/npm/v/twilio-flex-token-validator.svg" title="npm" />
     </a>
     <a href="https://www.npmjs.com/package/twilio-flex-token-validator">
-        <img src="https://img.shields.io/npm/dt/twilio-flex-token-validator.svg?style=flat-square" title="npm" />
+      <img src="https://img.shields.io/npm/dt/twilio-flex-token-validator.svg" title="npm" />
     </a>
     <a href="./LICENSE.md">
-        <img src="https://img.shields.io/badge/license-MIT-green.svg" title="License" />
+      <img src="https://img.shields.io/badge/license-MIT-green.svg" title="License" />
     </a>
 </p>
 
