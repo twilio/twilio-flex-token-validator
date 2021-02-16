@@ -91,7 +91,7 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
     const failedResponse = (message: string) => {
       const response = new Twilio.Response();
       response.appendHeader('Access-Control-Allow-Origin', '*');
-      response.appendHeader('Access-Control-Allow-Methods', 'OPTIONS POST GET');
+      response.appendHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET');
       response.appendHeader('Access-Control-Allow-Headers', 'Content-Type');
       response.appendHeader('Content-Type', 'plain/text');
       response.setStatusCode(403);
