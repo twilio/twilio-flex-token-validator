@@ -15,8 +15,10 @@ describe('index.ts', () => {
     jest.clearAllMocks();
   });
 
+  const iamUrl = 'https://iam.twilio.com';
+
   const mockHttps = () => {
-    return nock('https://iam.twilio.com').post(() => true);
+    return nock(iamUrl).post(() => true);
   };
 
   describe('validator', () => {
@@ -89,7 +91,7 @@ describe('index.ts', () => {
     });
 
     it('should validate', async () => {
-      const scope = nock('https://iam.twilio.com')
+      const scope = nock(iamUrl)
         .post('/v1/Accounts/AC123/Tokens/validate', { token: 'token-123' })
         .reply(200, '{"valid":true, "other": "parameter"}');
 
@@ -138,7 +140,7 @@ describe('index.ts', () => {
     });
 
     it('should validate', async () => {
-      const scope = nock('https://iam.twilio.com')
+      const scope = nock(iamUrl)
         .post('/v1/Accounts/AC123/Tokens/validate', { token: event.Token })
         .reply(200, '{"valid":true, "other": "parameter"}');
 
