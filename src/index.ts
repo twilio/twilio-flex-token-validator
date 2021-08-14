@@ -42,8 +42,13 @@ export const validator = async (token: string, accountSid: string, authToken: st
       reject('Unauthorized: AccountSid or AuthToken was not provided');
       return;
     }
+    
+    // detects if authToken is an object with attributes key and secret to assign hasAPIKey a boolean 
+    const hasAPIKey = !!apikeys ? (!!apikeys.key ? (!!apikeys.secret ? true : false ) : false) : false;
 
-    const authorization = Buffer.from(`${accountSid}:${authToken}`);
+    // changed to include API keys if hasAPIKey is true
+    const authorization = hasAPIKeys ? Buffer.from(`${apikeys.key}:${apikeys.secret}` : Buffer.from(`${accountSid}:${authToken}`);
+
     const requestData = JSON.stringify({ token });
     const requestOption = {
       hostname: 'iam.twilio.com',
@@ -52,9 +57,6 @@ export const validator = async (token: string, accountSid: string, authToken: st
       method: 'POST',
       headers: {
         Authorization: `Basic ${authorization.toString('base64')}`,
-        'Cache-Control': 'no-cache',
-        'Content-Type': 'application/json',
-        'Content-Length': requestData.length,
       },
     };
 
