@@ -23,31 +23,33 @@ export interface Event {
 
 export type Callback = (error: any, response: Twilio.Response) => void;
 export type HandlerFn = (context: Context, event: Event, callback: Callback) => void;
-
+export type AuthToken = string;
+export type APIKey = {secret: string, key: string};
 /**
  * Validates that the Token is valid
  *
  * @param token        the token to validate
  * @param accountSid   the accountSid
- * @param authToken    the authToken
+ * @param credential    the authToken
  */
-export const validator = async (token: string, accountSid: string, authToken: string): Promise<object> => {
+export const validator = async (token: string, accountSid: string, credential: APIKey | AuthToken): Promise<object> => {
   return new Promise((resolve, reject) => {
     if (!token) {
       reject('Unauthorized: Token was not provided');
       return;
     }
 
-    if (!accountSid || !authToken) {
+    if (!accountSid || !credential) {
       reject('Unauthorized: AccountSid or AuthToken was not provided');
       return;
     }
     
-    // detects if authToken is an object with attributes key and secret to assign hasAPIKey a boolean 
-    const hasAPIKey = !!apikeys ? (!!apikeys.key ? (!!apikeys.secret ? true : false ) : false) : false;
+    const hasAPIKey = credential && typeof credential === 'object' && credential.secret && credential.key;
 
     // changed to include API keys if hasAPIKey is true
-    const authorization = hasAPIKeys ? Buffer.from(`${apikeys.key}:${apikeys.secret}` : Buffer.from(`${accountSid}:${authToken}`);
+    const authorization = hasAPIKey 
+      ? Buffer.from(`${credential.key}:${credential.secret}`) 
+      : Buffer.from(`${accountSid}:${credential}`);
 
     const requestData = JSON.stringify({ token });
     const requestOption = {
