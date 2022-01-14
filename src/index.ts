@@ -44,11 +44,9 @@ export const validator = async (token: string, accountSid: string, credential: A
       return;
     }
 
-    const hasAPIKey = credential && typeof credential === 'object' && credential.secret && credential.key;
-
-    const authorization = hasAPIKey
-      ? Buffer.from(`${credential.key}:${credential.secret}`)
-      : Buffer.from(`${accountSid}:${credential}`);
+    const key = typeof credential === 'object' ? credential.key : accountSid;
+    const secret = typeof credential === 'object' ? credential.secret : credential;
+    const authorization = Buffer.from(`${key}:${secret}`);
 
     const requestData = JSON.stringify({ token });
     const requestOption = {
