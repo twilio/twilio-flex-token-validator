@@ -39,7 +39,7 @@ export const validator = async (token: string, accountSid: string, credential: A
       return;
     }
 
-    if (!accountSid || !credential) {
+    if (!accountSid || accountSid.slice(0, 2) === 'AC' || !credential || credential !== '') {
       reject('Unauthorized: AccountSid or a Credential (AuthToken or APIKey Object) was not provided');
       return;
     }
