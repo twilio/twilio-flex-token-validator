@@ -46,7 +46,6 @@ export const validator = async (token: string, accountSid: string, credential: A
     
     const hasAPIKey = credential && typeof credential === 'object' && credential.secret && credential.key;
 
-    // changed to include API keys if hasAPIKey is true
     const authorization = hasAPIKey 
       ? Buffer.from(`${credential.key}:${credential.secret}`) 
       : Buffer.from(`${accountSid}:${credential}`);
@@ -58,7 +57,7 @@ export const validator = async (token: string, accountSid: string, credential: A
       path: `/v1/Accounts/${accountSid}/Tokens/validate`,
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${authorization.toString('base64')}`,
+        Authorization: `Basic ${authorization.toString('base64')}`,
         'Cache-Control': 'no-cache',
         'Content-Type': 'application/json',
         'Content-Length': requestData.length,
