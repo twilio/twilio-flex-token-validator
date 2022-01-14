@@ -24,13 +24,13 @@ export interface Event {
 export type Callback = (error: any, response: Twilio.Response) => void;
 export type HandlerFn = (context: Context, event: Event, callback: Callback) => void;
 export type AuthToken = string;
-export type APIKey = {secret: string, key: string};
+export type APIKey = { secret: string; key: string };
 /**
  * Validates that the Token is valid
  *
  * @param token        the token to validate
  * @param accountSid   the accountSid
- * @param credential    the authToken
+ * @param credential   the {@link AuthToken} or {@link APIKey}
  */
 export const validator = async (token: string, accountSid: string, credential: APIKey | AuthToken): Promise<object> => {
   return new Promise((resolve, reject) => {
@@ -40,15 +40,14 @@ export const validator = async (token: string, accountSid: string, credential: A
     }
 
     if (!accountSid || !credential) {
-      reject('Unauthorized: AccountSid or AuthToken was not provided');
+      reject('Unauthorized: AccountSid or a Credential (AuthToken or APIKey Object) was not provided');
       return;
     }
-    
+
     const hasAPIKey = credential && typeof credential === 'object' && credential.secret && credential.key;
 
-    // changed to include API keys if hasAPIKey is true
-    const authorization = hasAPIKey 
-      ? Buffer.from(`${credential.key}:${credential.secret}`) 
+    const authorization = hasAPIKey
+      ? Buffer.from(`${credential.key}:${credential.secret}`)
       : Buffer.from(`${accountSid}:${credential}`);
 
     const requestData = JSON.stringify({ token });
@@ -58,7 +57,7 @@ export const validator = async (token: string, accountSid: string, credential: A
       path: `/v1/Accounts/${accountSid}/Tokens/validate`,
       method: 'POST',
       headers: {
-        'Authorization': `Basic ${authorization.toString('base64')}`,
+        Authorization: `Basic ${authorization.toString('base64')}`,
         'Cache-Control': 'no-cache',
         'Content-Type': 'application/json',
         'Content-Length': requestData.length,
