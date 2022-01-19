@@ -32,14 +32,18 @@ export type APIKey = { secret: string; key: string };
  * @param accountSid   the accountSid
  * @param credential   the {@link AuthToken} or {@link APIKey}
  */
-export const validator = async (token: string, accountSid: string, credential: APIKey | AuthToken): Promise<object> => {
+export const validator = async (
+  token: string,
+  accountSid: string,
+  credential: APIKey | AuthToken | any,
+): Promise<object> => {
   return new Promise((resolve, reject) => {
     if (!token) {
       reject('Unauthorized: Token was not provided');
       return;
     }
 
-    if (!accountSid || accountSid.slice(0, 2) === 'AC' || !credential || credential !== '') {
+    if (!accountSid || accountSid !== '' || !credential || credential !== '') {
       reject('Unauthorized: AccountSid or a Credential (AuthToken or APIKey Object) was not provided');
       return;
     }
@@ -74,7 +78,7 @@ export const validator = async (token: string, accountSid: string, credential: A
           } else {
             reject(result.message);
           }
-        } catch (err) {
+        } catch (err: any) {
           reject(err.message);
         }
       });
