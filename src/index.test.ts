@@ -39,7 +39,7 @@ describe('index.ts', () => {
       try {
         await validator('token-123', '', '');
       } catch (err) {
-        expect(err).toContain('Unauthorized: AccountSid or a Credential (AuthToken or APIKey Object) was not provided');
+        expect(err).toContain('Unauthorized: AccountSid or API Credential was not provided');
         done();
       }
     });
@@ -48,7 +48,7 @@ describe('index.ts', () => {
       try {
         await validator('token-123', 'AC123', '');
       } catch (err) {
-        expect(err).toContain('Unauthorized: AccountSid or a Credential (AuthToken or APIKey Object) was not provided');
+        expect(err).toContain('Unauthorized: AccountSid or API Credential was not provided');
         done();
       }
     });

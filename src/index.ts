@@ -44,7 +44,7 @@ export const validator = async (
     }
 
     if (!accountSid || accountSid === '' || !credential || credential === '') {
-      reject('Unauthorized: AccountSid or a Credential (AuthToken or APIKey Object) was not provided');
+      reject('Unauthorized: AccountSid or API Credential was not provided');
       return;
     }
 
