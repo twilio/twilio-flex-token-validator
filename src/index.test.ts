@@ -16,6 +16,10 @@ describe('index.ts', () => {
   });
 
   const iamUrl = 'https://iam.twilio.com';
+  const validationPath = '/v1/Accounts/AC123/Tokens/validate';
+  const testToken = 'testToken';
+  const replySuccessMessage = '{"valid":true, "other": "parameter"}';
+  const testAccpuntSid = 'AC123';
 
   const mockHttps = () => {
     return nock(iamUrl).post(() => true);
@@ -37,7 +41,7 @@ describe('index.ts', () => {
 
     it('should fail if no accountSid is provided', async (done) => {
       try {
-        await validator('token-123', '', '');
+        await validator(testToken, '', '');
       } catch (err) {
         expect(err).toContain('Unauthorized: AccountSid or API Credential was not provided');
         done();
@@ -46,9 +50,18 @@ describe('index.ts', () => {
 
     it('should fail if no authToken is provided', async (done) => {
       try {
-        await validator('token-123', 'AC123', '');
+        await validator(testToken, testAccpuntSid, '');
       } catch (err) {
         expect(err).toContain('Unauthorized: AccountSid or API Credential was not provided');
+        done();
+      }
+    });
+
+    it('should fail if credential is object with out a key and secret property', async (done) => {
+      try {
+        await validator(testToken, testAccpuntSid, {});
+      } catch (err) {
+        expect(err).toContain('Unauthorized: Missing Props - key and secret for API Credential was not provided');
         done();
       }
     });
@@ -57,7 +70,7 @@ describe('index.ts', () => {
       const scope = mockHttps().replyWithError('this failed');
 
       try {
-        await validator('token-123', 'AC123', 'authToken');
+        await validator(testToken, testAccpuntSid, 'authToken');
       } catch (err) {
         expect(scope.isDone()).toBeTruthy();
         expect(err).toEqual('this failed');
@@ -69,7 +82,7 @@ describe('index.ts', () => {
       const scope = mockHttps().reply(200, 'not-json-string');
 
       try {
-        await validator('token-123', 'AC123', 'authToken');
+        await validator(testToken, testAccpuntSid, 'authToken');
       } catch (err) {
         expect(scope.isDone()).toBeTruthy();
         expect(err).toContain('Unexpected token');
@@ -82,7 +95,7 @@ describe('index.ts', () => {
       const scope = mockHttps().reply(200, '{"valid":false, "message":"not valid"}');
 
       try {
-        await validator('token-123', 'AC123', 'authToken');
+        await validator(testToken, testAccpuntSid, 'authToken');
       } catch (err) {
         expect(scope.isDone()).toBeTruthy();
         expect(err).toEqual('not valid');
@@ -91,11 +104,18 @@ describe('index.ts', () => {
     });
 
     it('should validate', async () => {
-      const scope = nock(iamUrl)
-        .post('/v1/Accounts/AC123/Tokens/validate', { token: 'token-123' })
-        .reply(200, '{"valid":true, "other": "parameter"}');
+      const scope = nock(iamUrl).post(validationPath, { token: testToken }).reply(200, replySuccessMessage);
 
-      const response = await validator('token-123', 'AC123', 'authToken');
+      const response = await validator(testToken, testAccpuntSid, 'authToken');
+      expect(response).toEqual({ valid: true, other: 'parameter' });
+
+      expect(scope.isDone()).toBeTruthy();
+    });
+
+    it('should validate wjen replacing authToken with API Keys', async () => {
+      const scope = nock(iamUrl).post(validationPath, { token: testToken }).reply(200, replySuccessMessage);
+
+      const response = await validator(testToken, testAccpuntSid, { key: 'key-123', secret: 'secret-098' });
       expect(response).toEqual({ valid: true, other: 'parameter' });
 
       expect(scope.isDone()).toBeTruthy();
@@ -104,12 +124,12 @@ describe('index.ts', () => {
 
   describe('functionValidator', () => {
     const context: Context = {
-      ACCOUNT_SID: 'AC123',
+      ACCOUNT_SID: testAccpuntSid,
       AUTH_TOKEN: 'AUTH123',
     };
 
     const event: Event = {
-      Token: 'Token123',
+      Token: testToken,
     };
 
     afterEach(() => {
@@ -140,9 +160,7 @@ describe('index.ts', () => {
     });
 
     it('should validate', async () => {
-      const scope = nock(iamUrl)
-        .post('/v1/Accounts/AC123/Tokens/validate', { token: event.Token })
-        .reply(200, '{"valid":true, "other": "parameter"}');
+      const scope = nock(iamUrl).post(validationPath, { token: event.Token }).reply(200, replySuccessMessage);
 
       const fn = jest.fn();
       const cb = jest.fn();

@@ -48,10 +48,14 @@ export const validator = async (
       return;
     }
 
+    if ((typeof credential === 'object') === (!credential.key || !credential.secret)) {
+      reject('Unauthorized: Missing Props - key and secret for API Credential was not provided');
+      return;
+    }
+
     const key = typeof credential === 'object' ? credential.key : accountSid;
     const secret = typeof credential === 'object' ? credential.secret : credential;
     const authorization = Buffer.from(`${key}:${secret}`);
-
     const requestData = JSON.stringify({ token });
     const requestOption = {
       hostname: 'iam.twilio.com',
