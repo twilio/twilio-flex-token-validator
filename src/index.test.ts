@@ -20,6 +20,7 @@ describe('index.ts', () => {
   const testToken = 'testToken';
   const replySuccessMessage = '{"valid":true, "other": "parameter"}';
   const testAccpuntSid = 'AC123';
+  const unauthorizedNoAccountSidOrAuthMessage = 'Unauthorized: AccountSid or API credential was not provided';
 
   const mockHttps = () => {
     return nock(iamUrl).post(() => true);
@@ -43,25 +44,25 @@ describe('index.ts', () => {
       try {
         await validator(testToken, '', '');
       } catch (err) {
-        expect(err).toContain('Unauthorized: AccountSid or API Credential was not provided');
+        expect(err).toContain(unauthorizedNoAccountSidOrAuthMessage);
         done();
       }
     });
 
     it('should fail if no authToken is provided', async (done) => {
       try {
-        await validator(testToken, testAccpuntSid, '');
+        await validator(testToken, testAccpuntSid, undefined);
       } catch (err) {
-        expect(err).toContain('Unauthorized: AccountSid or API Credential was not provided');
+        expect(err).toContain(unauthorizedNoAccountSidOrAuthMessage);
         done();
       }
     });
 
-    it('should fail if credential is object with out a key and secret property', async (done) => {
+    it('should fail if credential is object without properties: key and secret', async (done) => {
       try {
         await validator(testToken, testAccpuntSid, {});
       } catch (err) {
-        expect(err).toContain('Unauthorized: Missing Props - key and secret for API Credential was not provided');
+        expect(err).toContain('Unauthorized: API credential missing props - key and secret');
         done();
       }
     });
@@ -112,7 +113,7 @@ describe('index.ts', () => {
       expect(scope.isDone()).toBeTruthy();
     });
 
-    it('should validate wjen replacing authToken with API Keys', async () => {
+    it('should validate when replacing authToken with API Keys', async () => {
       const scope = nock(iamUrl).post(validationPath, { token: testToken }).reply(200, replySuccessMessage);
 
       const response = await validator(testToken, testAccpuntSid, { key: 'key-123', secret: 'secret-098' });

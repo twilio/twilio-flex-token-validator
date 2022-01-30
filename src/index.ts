@@ -42,14 +42,13 @@ export const validator = async (
       reject('Unauthorized: Token was not provided');
       return;
     }
-
-    if (!accountSid || accountSid === '' || !credential || credential === '') {
-      reject('Unauthorized: AccountSid or API Credential was not provided');
+    if (!accountSid || !credential) {
+      reject('Unauthorized: AccountSid or API credential was not provided');
       return;
     }
 
     if ((typeof credential === 'object') === (!credential.key || !credential.secret)) {
-      reject('Unauthorized: Missing Props - key and secret for API Credential was not provided');
+      reject('Unauthorized: API credential missing props - key and secret');
       return;
     }
 
