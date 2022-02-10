@@ -20,10 +20,14 @@ export interface Context {
 
 export interface Event {
   Token: string;
-  TokenResult?: object;
+  TokenResult?: ValidationResponse;
 }
 
-export type Callback = (error: any, response: Twilio.Response) => void;
+export type ValidationResponse = {
+  valid: boolean;
+  message: string;
+}
+export type Callback = (error: Error | string | null, response: Twilio.Response) => void;
 export type HandlerFn = (context: Context, event: Event, callback: Callback) => void;
 export type AuthToken = string;
 export type ApiKey = string;
@@ -41,7 +45,7 @@ export const validator = async (
   token: string,
   accountSid: string,
   ...credentials: (Credential | null)[]
-): Promise<object> => {
+): Promise<ValidationResponse> => {
   return new Promise((resolve, reject) => {
     if (!token) {
       reject('Unauthorized: Token was not provided');
@@ -79,13 +83,13 @@ export const validator = async (
       resp.on('data', (d) => (data += d));
       resp.on('end', () => {
         try {
-          const result = JSON.parse(data);
+          const result: ValidationResponse = JSON.parse(data);
           if (result.valid) {
             resolve(result);
           } else {
             reject(result.message);
           }
-        } catch (err: any) {
+        } catch (err: Error | unknown | any) {
           reject(err.message);
         }
       });
@@ -141,6 +145,11 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
  * @returns string
  */
 function authiorizationHandler(accountSid: string, ...credentials: (Credential | null)[]): string | null {
+  function generateAuthorizationString(key: string, secret: string): string {
+    const authz = Buffer.from(`${key}:${secret}`);
+    return `Basic ${authz.toString('base64')}`;
+  }
+
   if (!credentials) return null;
 
   if (credentials.length === 1 && credentials[0]) {
@@ -150,10 +159,5 @@ function authiorizationHandler(accountSid: string, ...credentials: (Credential |
   if (credentials.length === 2 && credentials[0] && credentials[1]) {
     return generateAuthorizationString(credentials[0], credentials[1]);
   }
-
   return null;
-  function generateAuthorizationString(key: string, secret: string): string {
-    const authz = Buffer.from(`${key}:${secret}`);
-    return `Basic ${authz.toString('base64')}`;
-  }
 }
