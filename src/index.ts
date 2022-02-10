@@ -26,7 +26,7 @@ export interface Event {
 export type ValidationResponse = {
   valid: boolean;
   message: string;
-}
+};
 export type Callback = (error: Error | string | null, response: Twilio.Response) => void;
 export type HandlerFn = (context: Context, event: Event, callback: Callback) => void;
 export type AuthToken = string;
