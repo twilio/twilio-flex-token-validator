@@ -122,7 +122,7 @@ describe('index.ts', () => {
       const setStatusCode = jest.fn();
       const setBody = jest.fn();
       const appendHeader = jest.fn();
-      (global as Global | any).Twilio.Response = jest.fn().mockImplementation(() => ({
+      (global as any).Twilio.Response = jest.fn().mockImplementation(() => ({
         setStatusCode,
         setBody,
         appendHeader,
