@@ -1,6 +1,7 @@
 import * as https from 'https';
 
-declare namespace Twilio {
+// eslint-disable-next-line @typescript-eslint/prefer-namespace-keyword
+declare module Twilio {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   class Response {
     public appendHeader(key: string, value: string): void;
@@ -105,9 +106,8 @@ export const validator = async (
  *
  * @param handlerFn    the Twilio Runtime Handler Function
  */
-export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
-  // eslint-disable-next-line @typescript-eslint/promise-function-async
-  return (context, event, callback) => {
+export const functionValidator = async (handlerFn: HandlerFn): Promise<HandlerFn> => {
+  return async (context, event, callback) => {
     const failedResponse = (message: string) => {
       const response = new Twilio.Response();
       response.appendHeader('Access-Control-Allow-Origin', '*');
