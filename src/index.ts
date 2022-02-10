@@ -13,7 +13,9 @@ declare namespace Twilio {
 
 export interface Context {
   ACCOUNT_SID: string;
-  AUTH_TOKEN: string;
+  AUTH_TOKEN?: string;
+  API_KEY?: string;
+  API_SECRET?: string;
 }
 
 export interface Event {
@@ -23,35 +25,48 @@ export interface Event {
 
 export type Callback = (error: any, response: Twilio.Response) => void;
 export type HandlerFn = (context: Context, event: Event, callback: Callback) => void;
-
+export type AuthToken = string;
+export type ApiKey = string;
+export type ApiSecret = string;
+export type Credential = AuthToken | (ApiKey & ApiSecret);
 /**
  * Validates that the Token is valid
  *
  * @param token        the token to validate
  * @param accountSid   the accountSid
- * @param authToken    the authToken
+ * @param credentials  the AuthToken or APIKey and APISecret
+ * @returns
  */
-export const validator = async (token: string, accountSid: string, authToken: string): Promise<object> => {
+export const validator = async (
+  token: string,
+  accountSid: string,
+  ...credentials: (Credential | null)[]
+): Promise<object> => {
   return new Promise((resolve, reject) => {
     if (!token) {
       reject('Unauthorized: Token was not provided');
       return;
     }
 
-    if (!accountSid || !authToken) {
+    if (!accountSid || !credentials) {
       reject('Unauthorized: AccountSid or AuthToken was not provided');
       return;
     }
 
-    const authorization = Buffer.from(`${accountSid}:${authToken}`);
+    const authorization = authiorizationHandler(accountSid, ...credentials) as string;
+    if (!authorization) {
+      reject('Unauthorized: AccountSid or AuthToken was not provided');
+      return;
+    }
+
     const requestData = JSON.stringify({ token });
-    const requestOption = {
+    const requestOption: https.RequestOptions = {
       hostname: 'iam.twilio.com',
       port: 443,
       path: `/v1/Accounts/${accountSid}/Tokens/validate`,
       method: 'POST',
       headers: {
-        Authorization: `Basic ${authorization.toString('base64')}`,
+        Authorization: authorization,
         'Cache-Control': 'no-cache',
         'Content-Type': 'application/json',
         'Content-Length': requestData.length,
@@ -70,7 +85,7 @@ export const validator = async (token: string, accountSid: string, authToken: st
           } else {
             reject(result.message);
           }
-        } catch (err) {
+        } catch (err: any) {
           reject(err.message);
         }
       });
@@ -87,6 +102,7 @@ export const validator = async (token: string, accountSid: string, authToken: st
  * @param handlerFn    the Twilio Runtime Handler Function
  */
 export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
+  // eslint-disable-next-line @typescript-eslint/promise-function-async
   return (context, event, callback) => {
     const failedResponse = (message: string) => {
       const response = new Twilio.Response();
@@ -96,21 +112,20 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
       response.appendHeader('Content-Type', 'plain/text');
       response.setStatusCode(403);
       response.setBody(message);
-
       callback(null, response);
     };
 
-    const accountSid = context.ACCOUNT_SID;
-    const authToken = context.AUTH_TOKEN;
-    const token = event.Token;
+    const { ACCOUNT_SID: accountSid } = context;
 
-    if (!accountSid || !authToken) {
-      return failedResponse(
-        'Unauthorized: AccountSid or AuthToken was not provided. For more information, please visit https://twilio.com/console/runtime/functions/configure',
-      );
-    }
+    const { Token: token } = event;
 
-    return validator(token, accountSid, authToken)
+    const credentials: (Credential | null)[] = ['AUTH_TOKEN', 'API_KEY', 'API_SECRET'].filter(
+      (key: string): Credential | null => {
+        return context[key] ? context[key] : null;
+      },
+    );
+
+    return validator(token, accountSid, ...credentials)
       .then((result) => {
         event.TokenResult = result;
         return handlerFn(context, event, callback);
@@ -118,3 +133,27 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
       .catch(failedResponse);
   };
 };
+
+/**
+ * consumes accountSid, to generate the Authorization header value or null on failure
+ * @param accountSid the Account Sid
+ * @param credentials AuthToken or ApiKey, ApiSecret
+ * @returns string
+ */
+function authiorizationHandler(accountSid: string, ...credentials: (Credential | null)[]): string | null {
+  if (!credentials) return null;
+
+  if (credentials.length === 1 && credentials[0]) {
+    return generateAuthorizationString(accountSid, credentials[0]);
+  }
+
+  if (credentials.length === 2 && credentials[0] && credentials[1]) {
+    return generateAuthorizationString(credentials[0], credentials[1]);
+  }
+
+  return null;
+  function generateAuthorizationString(key: string, secret: string): string {
+    const authz = Buffer.from(`${key}:${secret}`);
+    return `Basic ${authz.toString('base64')}`;
+  }
+}
