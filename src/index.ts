@@ -135,7 +135,7 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
 };
 
 /**
- * consumes accountSid, to generate the Authorization header value or null on failure
+ * checks credentials and generates the authorization value for the header
  * @param accountSid the Account Sid
  * @param credentials AuthToken or ApiKey, ApiSecret
  * @returns string
