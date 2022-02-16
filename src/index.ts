@@ -105,7 +105,7 @@ export const validator = async (
   return new Promise((resolve, reject) => {
     const creds: CredentialTypes = { token, accountSid, credentials };
     const checkResult = checkCredentials(creds);
-    if (!checkResult.isValid){
+    if (!checkResult.isValid) {
       reject(checkResult.message);
       return;
     }
