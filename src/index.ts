@@ -103,8 +103,11 @@ export const validator = async (
   };
 
   return new Promise((resolve, reject) => {
-    const tests: CredentialTypes = { token, accountSid, credentials };
-    if (checkCredentials(tests)) {
+    const creds: CredentialTypes = { token, accountSid, credentials };
+    const checkResult = checkCredentials(creds);
+    if (!checkResult.isValid){
+      reject(checkResult.message);
+      return;
     }
 
     const authorization = authiorizationHandler(accountSid, ...credentials) as string;
