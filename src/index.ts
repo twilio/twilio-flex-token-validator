@@ -1,16 +1,6 @@
 import * as https from 'https';
 
-
-declare namespace Twilio {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  class Response {
-    public appendHeader(key: string, value: string): void;
-
-    public setStatusCode(code: number): void;
-
-    public setBody(body: string): void;
-  }
-}
+import Response from 'twilio/lib/http/response';
 
 export interface Context {
   ACCOUNT_SID: string;
@@ -19,21 +9,82 @@ export interface Context {
   API_SECRET?: string;
 }
 
+export interface ValidationResponse {
+  valid: boolean;
+  message: string;
+}
+
+export interface ValidtionError {
+  message: string;
+}
+
 export interface Event {
   Token: string;
   TokenResult?: ValidationResponse;
 }
 
-export type ValidationResponse = {
-  valid: boolean;
-  message: string;
-};
-export type Callback = (error: Error | string | null, response: Twilio.Response) => void;
+export interface CredentialTypes {
+  token: string;
+  accountSid: string;
+  credentials: (Credential | null)[];
+}
+
+export type Callback = (error: Error | string | null, response: Response<ValidationResponse>) => void;
 export type HandlerFn = (context: Context, event: Event, callback: Callback) => void;
 export type AuthToken = string;
 export type ApiKey = string;
 export type ApiSecret = string;
 export type Credential = AuthToken | (ApiKey & ApiSecret);
+
+function generateAuthorizationString(key: string, secret: string): string {
+  const authz = Buffer.from(`${key}:${secret}`);
+  return `Basic ${authz.toString('base64')}`;
+}
+
+/**
+ * checks credentials and generates the authorization value for the header
+ * @param accountSid the Account Sid
+ * @param credentials AuthToken or ApiKey, ApiSecret
+ * @returns string
+ */
+function authiorizationHandler(accountSid: string, ...credentials: (Credential | null)[]): string | null {
+  if (!credentials) return null;
+
+  if (credentials.length === 1 && credentials[0]) {
+    return generateAuthorizationString(accountSid, credentials[0]);
+  }
+
+  if (credentials.length === 2 && credentials[0] && credentials[1]) {
+    return generateAuthorizationString(credentials[0], credentials[1]);
+  }
+  return null;
+}
+
+function checkCredentials(tests: CredentialTypes): { isValid: boolean; message?: string } {
+  if (!tests.token) {
+    return {
+      isValid: false,
+      message: 'Unauthorized: Token was not provided',
+    };
+  }
+
+  if (!tests.accountSid) {
+    return {
+      isValid: false,
+      message: 'Unauthorized: AccountSid or AuthToken was not provided',
+    };
+  }
+
+  if (!tests.credentials) {
+    return {
+      isValid: false,
+      message: 'Unauthorized: AuthToken or APIKeys not provided',
+    };
+  }
+
+  return { isValid: true };
+}
+
 /**
  * Validates that the Token is valid
  *
@@ -47,15 +98,13 @@ export const validator = async (
   accountSid: string,
   ...credentials: (Credential | null)[]
 ): Promise<ValidationResponse> => {
-  return new Promise((resolve, reject) => {
-    if (!token) {
-      reject('Unauthorized: Token was not provided');
-      return;
-    }
+  const isValidationError = (x: any): x is ValidtionError => {
+    return typeof x.message === 'string';
+  };
 
-    if (!accountSid || !credentials) {
-      reject('Unauthorized: AccountSid or AuthToken was not provided');
-      return;
+  return new Promise((resolve, reject) => {
+    const tests: CredentialTypes = { token, accountSid, credentials };
+    if (checkCredentials(tests)) {
     }
 
     const authorization = authiorizationHandler(accountSid, ...credentials) as string;
@@ -84,14 +133,16 @@ export const validator = async (
       resp.on('data', (d) => (data += d));
       resp.on('end', () => {
         try {
-          const result: ValidationResponse = JSON.parse(data);
+          const result: ValidationResponse = JSON.parse(data) || new Error('JSON.parse failed');
           if (result.valid) {
             resolve(result);
           } else {
-            reject(result.message);
+            reject(<unknown>result.message);
           }
-        } catch (err: Error | unknown | any) {
-          reject(err.message);
+        } catch (err) {
+          if (isValidationError(err)) {
+            reject(err.message);
+          }
         }
       });
     });
@@ -107,8 +158,9 @@ export const validator = async (
  * @param handlerFn    the Twilio Runtime Handler Function
  */
 export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
-  return (context, event, callback) => {
+  return async (context, event, callback) => {
     const failedResponse = (message: string) => {
+      // @ts-expect-error Twilio is provided as an ambient class with the Twilio host
       const response = new Twilio.Response();
       response.appendHeader('Access-Control-Allow-Origin', '*');
       response.appendHeader('Access-Control-Allow-Methods', 'OPTIONS, POST, GET');
@@ -136,27 +188,3 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
       .catch(failedResponse);
   };
 };
-
-/**
- * checks credentials and generates the authorization value for the header
- * @param accountSid the Account Sid
- * @param credentials AuthToken or ApiKey, ApiSecret
- * @returns string
- */
-function authiorizationHandler(accountSid: string, ...credentials: (Credential | null)[]): string | null {
-  function generateAuthorizationString(key: string, secret: string): string {
-    const authz = Buffer.from(`${key}:${secret}`);
-    return `Basic ${authz.toString('base64')}`;
-  }
-
-  if (!credentials) return null;
-
-  if (credentials.length === 1 && credentials[0]) {
-    return generateAuthorizationString(accountSid, credentials[0]);
-  }
-
-  if (credentials.length === 2 && credentials[0] && credentials[1]) {
-    return generateAuthorizationString(credentials[0], credentials[1]);
-  }
-  return null;
-}

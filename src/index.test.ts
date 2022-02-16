@@ -122,7 +122,8 @@ describe('index.ts', () => {
       const setStatusCode = jest.fn();
       const setBody = jest.fn();
       const appendHeader = jest.fn();
-      (global as any).Twilio.Response = jest.fn().mockImplementation(() => ({
+      // @ts-expect-error Twilio is provided ambiently durring runtime
+      global.Twilio.Response = jest.fn().mockImplementation(() => ({
         setStatusCode,
         setBody,
         appendHeader,
