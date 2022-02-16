@@ -98,7 +98,8 @@ export const validator = async (
   accountSid: string,
   ...credentials: (Credential | null)[]
 ): Promise<ValidationResponse> => {
-  const isValidationError = (x: any): x is ValidtionError => {
+  // eslint-disable-next-line
+  const isValidationError = (x: any): x is ValidtionError => { // skipcq: JS-0323
     return typeof x.message === 'string';
   };
 
