@@ -14,7 +14,7 @@ declare namespace Twilio {
 export interface Context {
   ACCOUNT_SID: string;
   AUTH_TOKEN: string;
-  TWILIO_REGION: string;
+  TWILIO_REGION?: string;
 }
 
 export interface Event {
@@ -32,7 +32,12 @@ export type HandlerFn = (context: Context, event: Event, callback: Callback) => 
  * @param accountSid   the accountSid
  * @param authToken    the authToken
  */
-export const validator = async (token: string, accountSid: string, authToken: string, realm?: string): Promise<object> => {
+export const validator = async (
+  token: string,
+  accountSid: string,
+  authToken: string,
+  realm?: string,
+): Promise<object> => {
   return new Promise((resolve, reject) => {
     if (!token) {
       reject('Unauthorized: Token was not provided');
@@ -112,8 +117,7 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
       );
     }
     let twilioRegion = null;
-    if(context.TWILIO_REGION)
-      twilioRegion = context.TWILIO_REGION.split("-");
+    if (context.TWILIO_REGION) twilioRegion = context.TWILIO_REGION.split('-');
     const realm = twilioRegion ? twilioRegion[0] : '';
     return validator(token, accountSid, authToken, realm)
       .then((result) => {
