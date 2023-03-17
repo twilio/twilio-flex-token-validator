@@ -116,10 +116,9 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
         'Unauthorized: AccountSid or AuthToken was not provided. For more information, please visit https://twilio.com/console/runtime/functions/configure',
       );
     }
-    let twilioRegion = null;
-    if (context.TWILIO_REGION) twilioRegion = context.TWILIO_REGION.split('-');
-    const realm = twilioRegion ? twilioRegion[0] : '';
-    return validator(token, accountSid, authToken, realm)
+
+    const region = context.TWILIO_REGION ? context.TWILIO_REGION.split('-')[0] : '';
+    return validator(token, accountSid, authToken, region)
       .then((result) => {
         event.TokenResult = result;
         return handlerFn(context, event, callback);
