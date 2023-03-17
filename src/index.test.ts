@@ -17,6 +17,11 @@ describe('index.ts', () => {
 
   const iamUrl = 'https://iam.twilio.com';
 
+  const iamStageUrl = 'https://iam.stage.twilio.com';
+
+  const validateUrl = '/v1/Accounts/AC123/Tokens/validate';
+  const reply = '{"valid":true, "other": "parameter"}';
+
   const mockHttps = () => {
     return nock(iamUrl).post(() => true);
   };
@@ -91,9 +96,7 @@ describe('index.ts', () => {
     });
 
     it('should validate', async () => {
-      const scope = nock(iamUrl)
-        .post('/v1/Accounts/AC123/Tokens/validate', { token: 'token-123' })
-        .reply(200, '{"valid":true, "other": "parameter"}');
+      const scope = nock(iamUrl).post(validateUrl, { token: 'token-123' }).reply(200, reply);
 
       const response = await validator('token-123', 'AC123', 'authToken');
       expect(response).toEqual({ valid: true, other: 'parameter' });
@@ -140,9 +143,26 @@ describe('index.ts', () => {
     });
 
     it('should validate', async () => {
-      const scope = nock(iamUrl)
-        .post('/v1/Accounts/AC123/Tokens/validate', { token: event.Token })
-        .reply(200, '{"valid":true, "other": "parameter"}');
+      const scope = nock(iamUrl).post(validateUrl, { token: event.Token }).reply(200, reply);
+
+      const fn = jest.fn();
+      const cb = jest.fn();
+
+      await functionValidator(fn)(context, event, cb);
+
+      expect(fn).toHaveBeenCalledTimes(1);
+      expect(cb).not.toHaveBeenCalled();
+
+      expect(scope.isDone()).toBeTruthy();
+    });
+
+    it('should validate for stage realm', async () => {
+      const context: Context = {
+        ACCOUNT_SID: 'AC123',
+        AUTH_TOKEN: 'AUTH123',
+        TWILIO_REGION: 'stage-us1',
+      };
+      const scope = nock(iamStageUrl).post(validateUrl, { token: event.Token }).reply(200, reply);
 
       const fn = jest.fn();
       const cb = jest.fn();
