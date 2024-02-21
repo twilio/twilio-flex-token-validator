@@ -21,6 +21,10 @@ export interface Event {
   Token: string;
   TokenResult?: object;
 }
+export interface ApiCredentials {
+  Sid: string;
+  Secret: string;
+}
 
 export type Callback = (error: any, response: Twilio.Response) => void;
 export type HandlerFn = (context: Context, event: Event, callback: Callback) => void;
@@ -28,15 +32,17 @@ export type HandlerFn = (context: Context, event: Event, callback: Callback) => 
 /**
  * Validates that the Token is valid
  *
- * @param token        the token to validate
- * @param accountSid   the accountSid
- * @param authToken    the authToken
+ * @param token          the token to validate
+ * @param accountSid     the accountSid
+ * @param authToken      the authToken
+ * @param apiCredentials optional api credentials to use instead of root account credentials
  */
 export const validator = async (
   token: string,
   accountSid: string,
   authToken: string,
   realm?: string,
+  apiCredentials?: ApiCredentials,
 ): Promise<object> => {
   return new Promise((resolve, reject) => {
     if (!token) {
@@ -44,12 +50,17 @@ export const validator = async (
       return;
     }
 
-    if (!accountSid || !authToken) {
-      reject('Unauthorized: AccountSid or AuthToken was not provided');
+    if (!accountSid) {
+      reject('Unauthorized: AccountSid was not provided');
+      if (!authToken && (!apiCredentials?.Sid || !apiCredentials?.Secret)) {
+        reject('Unauthorized: AuthToken or Api Credentials were not provided');
+      }
       return;
     }
 
-    const authorization = Buffer.from(`${accountSid}:${authToken}`);
+    const authorization = authToken
+      ? Buffer.from(`${accountSid}:${authToken}`)
+      : Buffer.from(`${apiCredentials?.Sid}:${apiCredentials?.Secret}`);
     const requestData = JSON.stringify({ token });
     const hostname = realm ? `iam.${realm}.twilio.com` : `iam.twilio.com`;
     const requestOption = {
