@@ -92,7 +92,7 @@ describe('index.ts', () => {
       }
     });
 
-    it('should fail to validate if response valid is fis not valid JSONalse', async (done) => {
+    it('should fail to validate if response is not valid JSON', async (done) => {
       const scope = mockHttps().reply(200, '{"valid":false, "message":"not valid"}');
 
       try {
