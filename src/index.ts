@@ -52,9 +52,11 @@ export const validator = async (
 
     if (!accountSid) {
       reject('Unauthorized: AccountSid was not provided');
-      if (!authToken && (!apiCredentials?.Sid || !apiCredentials?.Secret)) {
-        reject('Unauthorized: AuthToken or Api Credentials were not provided');
-      }
+      return;
+    }
+
+    if (!authToken && (!apiCredentials?.Sid || !apiCredentials?.Secret)) {
+      reject('Unauthorized: AuthToken or Api Credentials were not provided');
       return;
     }
 
