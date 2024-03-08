@@ -57,7 +57,7 @@ export const validator = async (
       return;
     }
 
-    if (!authToken || (!apiCredentials?.Sid && !apiCredentials?.Secret)) {
+    if (!authToken && (!apiCredentials?.Sid || !apiCredentials?.Secret)) {
       reject('Unauthorized: AuthToken or Api Credentials were not provided');
       return;
     }
@@ -134,7 +134,7 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
       );
     }
 
-    if (!authToken || (!apiKey && !apiSecret)) {
+    if (!authToken && (!apiKey || !apiSecret)) {
       return failedResponse(
         'Unauthorized: AuthToken or Api Credentials were not provided. For more information, please visit https://twilio.com/console/runtime/functions/configure',
       );
