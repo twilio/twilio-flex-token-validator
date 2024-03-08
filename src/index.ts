@@ -145,10 +145,12 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
       return validator(token, accountSid, undefined, region, {
         Sid: apiKey as string,
         Secret: apiSecret as string,
-      }).then((result) => {
-        event.TokenResult = result;
-        return handlerFn(context, event, callback);
-      });
+      })
+        .then((result) => {
+          event.TokenResult = result;
+          return handlerFn(context, event, callback);
+        })
+        .catch(failedResponse);
     }
 
     return validator(token, accountSid, authToken, region)
