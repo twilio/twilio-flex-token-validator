@@ -44,7 +44,7 @@ describe('index.ts', () => {
       try {
         await validator('token-123', '', '');
       } catch (err) {
-        expect(err).toContain('Unauthorized: AccountSid or AuthToken was not provided');
+        expect(err).toContain('Unauthorized: AccountSid was not provided');
         done();
       }
     });
@@ -53,7 +53,16 @@ describe('index.ts', () => {
       try {
         await validator('token-123', 'AC123', '');
       } catch (err) {
-        expect(err).toContain('Unauthorized: AccountSid or AuthToken was not provided');
+        expect(err).toContain('Unauthorized: AuthToken or Api Credentials were not provided');
+        done();
+      }
+    });
+
+    it('should fail if no authToken and no API Credentials are provided', async (done) => {
+      try {
+        await validator('token-123', 'AC123', '', '', { Sid: '', Secret: '' });
+      } catch (err) {
+        expect(err).toContain('Unauthorized: AuthToken or Api Credentials were not provided');
         done();
       }
     });
@@ -78,12 +87,12 @@ describe('index.ts', () => {
       } catch (err) {
         expect(scope.isDone()).toBeTruthy();
         expect(err).toContain('Unexpected token');
-        expect(err).toContain('in JSON at position');
+        expect(err).toContain('is not valid JSON');
         done();
       }
     });
 
-    it('should fail to validate if response valid is false', async (done) => {
+    it('should fail to validate if response is not valid JSON', async (done) => {
       const scope = mockHttps().reply(200, '{"valid":false, "message":"not valid"}');
 
       try {
