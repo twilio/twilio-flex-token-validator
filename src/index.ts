@@ -15,6 +15,8 @@ export interface Context {
   ACCOUNT_SID: string;
   AUTH_TOKEN: string;
   TWILIO_REGION?: string;
+  API_KEY?: string;
+  API_SECRET?: string;
 }
 
 export interface Event {
@@ -40,7 +42,7 @@ export type HandlerFn = (context: Context, event: Event, callback: Callback) => 
 export const validator = async (
   token: string,
   accountSid: string,
-  authToken: string,
+  authToken?: string,
   realm?: string,
   apiCredentials?: ApiCredentials,
 ): Promise<object> => {
@@ -122,15 +124,33 @@ export const functionValidator = (handlerFn: HandlerFn): HandlerFn => {
 
     const accountSid = context.ACCOUNT_SID;
     const authToken = context.AUTH_TOKEN;
+    const apiKey = context.API_KEY;
+    const apiSecret = context.API_SECRET;
     const token = event.Token;
 
-    if (!accountSid || !authToken) {
+    if (!accountSid) {
       return failedResponse(
-        'Unauthorized: AccountSid or AuthToken was not provided. For more information, please visit https://twilio.com/console/runtime/functions/configure',
+        'Unauthorized: AccountSid was not provided. For more information, please visit https://twilio.com/console/runtime/functions/configure',
+      );
+    }
+
+    if (!authToken && (!apiKey || !apiSecret)) {
+      return failedResponse(
+        'Unauthorized: AuthToken or Api Credentials were not provided. For more information, please visit https://twilio.com/console/runtime/functions/configure',
       );
     }
 
     const region = context.TWILIO_REGION ? context.TWILIO_REGION.split('-')[0] : '';
+    if (!authToken) {
+      return validator(token, accountSid, undefined, region, {
+        Sid: apiKey as string,
+        Secret: apiSecret as string,
+      }).then((result) => {
+        event.TokenResult = result;
+        return handlerFn(context, event, callback);
+      });
+    }
+
     return validator(token, accountSid, authToken, region)
       .then((result) => {
         event.TokenResult = result;
